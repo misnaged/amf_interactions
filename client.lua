@@ -1,176 +1,195 @@
-local kushetki = {
-    { x = -819.2239, y = -1312.3547, z = 43.2034 }, --blackwater
-    { x = 2715.9, y = -1285.04, z = -100 },  --saint
-}
+RegisterCommand('intmenu', function(source, args, rawCommand)             --                                                                
+    RegisterNetEvent("newmenu")                                           --                                  
+     WarMenu.OpenMenu('Animations')                                       -- Создание скриптовой команды для использования. Пример: открываешь консоль и пишешь "intmenu" - результат: открывается меню                                     
+     WarMenu.Display()                                                    --                         
+end)                                                                      --       
+                                                                             
+ -- Основная проблема вот с этим говном             
+function animacion(sceneid) -- нужно ли в скобках sceneid я не уверен                                                                         --                              
+local ped = PlayerPedId()   -- ped = это Pedestrian у Рокстарцев так называется что то одушевленное типа человека, животного                                                                           --                            
+local x, y, z = table.unpack(GetEntityCoords(ped))  -- table.unpack(GetEntityCoords(ped)) - берет текущее положение Entity, в нашем случае игрока      --                                                     
+local h = GetEntityHeading(ped) -- heading это направление (куда смотреть будет) - GetEntityHeading - текущее направление игрока                                        
+TaskStartScenarioAtPosition(ped, GetHashKey(sceneID), x, y, z, h, -1, false, false, 0, 0, false)      --   собственно нативная команда, которая начинает сценарий (предопределенная анимация) с конкретной позиции                                                                                                
+end                                                                                                   --      
+
+-- В идеале я хотел получить следующее: открывается менюшечка с анимациями и ты мог выбрать нужную анимку. 
+
+---------------- это образец 
+ --   if WarMenu.Button("     LEAN BACK RAILING   ") then     -- создает кнопку с названием анимациями  
+ --   animacion()        --  отсылка к функции 
+--   sceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING' -- вот с этим самая главная беда. в команде  TaskStartScenarioAtPosition(), параметр GetHashKey() - отвечает за получение хэша (у рокстарев все в хэшше). 
 
 
-local active = false
-local BWKushPrompt
---local StopPrompt
-local hasAlreadyEnteredMarker, lastZone
-local currentZone = nil
+-- то есть команда в идеале выглядела бы так: -  TaskStartScenarioAtPosition(ped, GetHashKey('WORLD_HUMAN_LEAN_BACK_RAILING'), x, y, z, h, -1, false, false, 0, 0, false)      
+-- по какой то причине именно 'WORLD_HUMAN_LEAN_BACK_RAILING' работает, а вот остальные ни в какую не хотят работать =(
 
-function SetupBWKushPrompt() -- устанавливаем кнопку для вызова меню интеракции
-    Citizen.CreateThread(function()
-        local str = 'Kooshetka'
-        BWKushPrompt = PromptRegisterBegin()
-        PromptSetControlAction(BWKushPrompt, 0xE8342FF2)
-        str = CreateVarString(10, 'LITERAL_STRING', str)
-        PromptSetText(BWKushPrompt, str)
-        PromptSetEnabled(BWKushPrompt, false)
-        PromptSetVisible(BWKushPrompt, false)
-        PromptSetHoldMode(BWKushPrompt, true)
-        PromptRegisterEnd(BWKushPrompt)
-    end)
-end
-
---function SetupStopPrompt()
---    Citizen.CreateThread(function()
---        local str = 'stop da rock'
---        StopPrompt = PromptRegisterBegin()
---        PromptSetControlAction(StopPrompt, 0xCDC4E4E9)
---        str = CreateVarString(10, 'LITERAL_STRING', str)
---        PromptSetText(StopPrompt, str)
---        PromptSetEnabled(StopPrompt, false)
----- PromptSetEnabled(StopPrompt,
-----          PromptSetVisible(StopPrompt, false)
---        PromptSetHoldMode(StopPrompt, true)
---        PromptRegisterEnd(StopPrompt)
---
---    end)
---end
-
-AddEventHandler('amf_interactions:hasEnteredMarker', function(zone) -- добавляем проверку: находится ли игрок внутри маркера
-    currentZone     = zone
-end)
-
-AddEventHandler('amf_interactions:hasExitedMarker', function(zone) -- добавляем проверку: вышел ли игрок из маркера
-    if active == true then
-        PromptSetEnabled(BWKushPrompt, false)
-        PromptSetVisible(BWKushPrompt, false)
-    -- PromptSetEnabled(StopPrompt, false)
-     -- PromptSetVisible(StopPrompt, false)
-        active = false
-    end
-    WarMenu.CloseMenu()
-    currentZone = nil
-end)
-
-Citizen.CreateThread(function()  -- Собственно, сама функция проверки
-    SetupBWKushPrompt()
-    while true do
-        Citizen.Wait(0)
-        local player = PlayerPedId()
-        local coords = GetEntityCoords(player)
-        local isInMarker, currentZone = false
-
-         for k,v in ipairs(kushetki) do
-            if (Vdist(coords.x, coords.y, coords.z, v.x, v.y, v.z) < 1.5) then
-                isInMarker  = true
-                currentZone = 'kushetki'
-                lastZone    = 'kushetki'
-            end
-        end
-
-        if isInMarker and not hasAlreadyEnteredMarker then
-            hasAlreadyEnteredMarker = true
-            TriggerEvent('amf_interactions:hasEnteredMarker', currentZone)
-        end
-
-        if not isInMarker and hasAlreadyEnteredMarker then
-            hasAlreadyEnteredMarker = false
-            TriggerEvent('amf_interactions:hasExitedMarker', lastZone)
-        end
-
-    end
-end)
-
--- Citizen.CreateThread(function()  
---     SetupStopPrompt()
---         while true do
---         Citizen.Wait(0)
---         ClearPedTasks(PlayerPedId())
--- Citizen.Wait(2000)
--- ClearPedTasksImmediately(PlayerPedId())
--- end
--- end)
+-- 
 
 Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(0)
-        if currentZone then
-         if active == false then
-             PromptSetEnabled(BWKushPrompt, true)
-             PromptSetVisible(BWKushPrompt, true)
-            -- PromptSetEnabled(StopPrompt, true)
-            -- PromptSetVisible(StopPrompt, true)
-             active = true
-         end
-         if PromptHasHoldModeCompleted(BWKushPrompt) then
-             WarMenu.OpenMenu('KushMusic')
-             WarMenu.Display()
-             PromptSetEnabled(BWKushPrompt, false)
-             PromptSetVisible(BWKushPrompt, false)
-         --  PromptSetEnabled(StopPrompt, false)
-         --  PromptSetVisible(StopPrompt, false)
-                active = false
 
-                currentZone = nil
-            end
-        else
-            Citizen.Wait(500)
-        end
-    end
-end)
+    WarMenu.CreateMenu('Animations', 'Actions')
+    WarMenu.CreateSubMenu('Leanback', 'Animations', 'Lean back')
+    WarMenu.CreateSubMenu('Leanleft', 'Animations', 'Lean left')
+    WarMenu.CreateSubMenu('Leanright', 'Animations', 'Lean right')
+    WarMenu.CreateSubMenu('Lean', 'Animations', 'Lean')
+   -- WarMenu.CreateSubMenu('Sitground', 'Animations', 'Sitting on a ground')
+   -- WarMenu.CreateSubMenu('Sitchair', 'Animations', 'Sitting on a chair/bench/stool')
 
-
-
-
-Citizen.CreateThread(function()
-    WarMenu.CreateMenu('KushMusic', 'Actions')
-    WarMenu.CreateSubMenu('PlayBanjo', 'KushMusic', 'Play banjo')
-    WarMenu.CreateSubMenu('PlayMandoline', 'KushMusic', 'Play mandoline')
-    WarMenu.CreateSubMenu('PlayGuitar', 'KushMusic', 'Play Guitar')
  while true do
-        if WarMenu.IsMenuOpened('KushMusic') then
+        if WarMenu.IsMenuOpened('Animations') then
 
-            if WarMenu.MenuButton('Play banjo', 'PlayBanjo') then end
-            if WarMenu.MenuButton('Play mandoline', 'PlayMandoline') then end
-            if WarMenu.MenuButton('Play Guitar', 'PlayGuitar') then end
+        if WarMenu.MenuButton('Lean back', 'Leanback') then end
+        if WarMenu.MenuButton('Lean left', 'Leanleft') then end
+        if WarMenu.MenuButton('Lean right', 'Leanright') then end
+        if WarMenu.MenuButton('Lean', 'Lean') then end
+      --  if WarMenu.MenuButton('Sitting on a ground', 'Sitground') then end
+      --  if WarMenu.MenuButton('Sitting on a chair/bench/stool', 'Sitchair') then end
+
             WarMenu.Display()
  
-        elseif WarMenu.IsMenuOpened('PlayBanjo') then
-
-            if WarMenu.Button("     Happy    ") then
-            TaskStartScenarioAtPosition(PlayerPedId(), GetHashKey('PROP_HUMAN_SEAT_CHAIR_BANJO_UPBEAT'), -819.2239, -1312.3547, 43.2034, 171.39, -1, false, false, 0, 0, false)
-
-             elseif WarMenu.Button("   Deep   ") then
-            TaskStartScenarioAtPosition(PlayerPedId(), GetHashKey('PROP_HUMAN_SEAT_CHAIR_BANJO_DOWNBEAT'), -819.2239, -1312.3547, 43.2034, 171.39, -1, false, false, 0, 0, false)
+        elseif WarMenu.IsMenuOpened('Leanback') then
+ 
+                if WarMenu.Button("     LEAN BACK RAILING   ") then     -- это создает кнопку с названием анимациями
+                  animacion()                                           --  отсылка к функции, описанной выше "function animacion(sceneid)"
+                  sceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING'  -- то что не работает
+                 elseif WarMenu.Button("   LEAN BACK WALL BACK WALL   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL'
+                 elseif WarMenu.Button("   LEAN BACK WALL NO PROPS   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL_NO_PROPS'
+                elseif WarMenu.Button("   LEAN BACK RAILING WHITTLE   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_BACK_WHITTLE'
+                elseif WarMenu.Button("   LEAN BACK DRINKING   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING_DRINKING'
             end
                     WarMenu.Display()
 
 -----------------------------------------------------
 
-            elseif WarMenu.IsMenuOpened('PlayMandoline') then
+            elseif WarMenu.IsMenuOpened('Leanleft') then
 
-            if WarMenu.Button("     Happy    ") then
-            TaskStartScenarioAtPosition(PlayerPedId(), GetHashKey('PROP_HUMAN_SEAT_BENCH_MANDOLIN_UPBEAT'), -819.2239, -1312.3547, 43.2034, 171.39, -1, false, false, 0, 0, false)
+                if WarMenu.Button("     LEAN POST LEFT   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_POST_LEFT'
+                 elseif WarMenu.Button("   LEAN POST LEFT HAND PLANTED   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_POST_LEFT_HAND_PLANTED'
+                 elseif WarMenu.Button("  LEAN RAILING LEFT    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_LEFT'
+                 elseif WarMenu.Button("  LEAN WALL LEFT    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_WALL_LEFT'
 
-             elseif WarMenu.Button("   Deep   ") then
-            TaskStartScenarioAtPosition(PlayerPedId(), GetHashKey('PROP_HUMAN_SEAT_BENCH_MANDOLIN_DOWNBEAT'), -819.2239, -1312.3547, 43.2034, 171.39, -1, false, false, 0, 0, false)
             end
                     WarMenu.Display()
 -----------------------------------------------------
    
-            elseif WarMenu.IsMenuOpened('PlayGuitar') then
+            elseif WarMenu.IsMenuOpened('Leanright') then
 
-            if WarMenu.Button("     Happy    ") then
-            TaskStartScenarioAtPosition(PlayerPedId(), GetHashKey('WORLD_HUMAN_SIT_GUITAR_UPBEAT'), -819.2239, -1312.3547, 43.2034, 171.39, -1, false, false, 0, 0, false)
-
-             elseif WarMenu.Button("   Deep   ") then
-            TaskStartScenarioAtPosition(PlayerPedId(), GetHashKey('WORLD_HUMAN_SIT_GUITAR_DOWNBEAT'), -819.2239, -1312.3547, 43.2034, 171.39, -1, false, false, 0, 0, false)
+                if WarMenu.Button("     LEAN POST RIGHT   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_POST_RIGHT'
+                 elseif WarMenu.Button("  LEAN POST RIGHT HAND PLANTED    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_POST_RIGHT_HAND_PLANTED'
+                 elseif WarMenu.Button("  LEAN WALL RIGHT    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_WALL_RIGHT'
             end
                     WarMenu.Display()
+-----------------------------------------------------
+ 
+        elseif WarMenu.IsMenuOpened('Lean') then
+
+                if WarMenu.Button("   LEAN READ PAPER      ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_READ_PAPER'
+                 elseif WarMenu.Button("   LEAN READ PAPER TRAIN PLANS   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_READ_PAPER_TRAIN_PLANS'
+                 elseif WarMenu.Button("  GUARD LEAN WALL    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_GUARD_LEAN_WALL'
+                 elseif WarMenu.Button("  LEAN CHECK PISTOL    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_CHECK_PISTOL'
+                 elseif WarMenu.Button("   LEAN TABLE SHARPEN KNIFE ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_TABLE_SHARPEN_KNIFE'
+                elseif WarMenu.Button("  LEAN BARREL    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_BARREL'
+                 elseif WarMenu.Button("  LEAN BAR READ NEWSPAPER    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_BAR_READ_NEWSPAPER'
+                elseif WarMenu.Button("    LEAN WALL DRINKING  ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_WALL_DRINKING'
+                elseif WarMenu.Button("   LEAN RAILING   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING'                
+                elseif WarMenu.Button("    LEAN RAILING DRINKING  ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_DRINKING'
+                 elseif WarMenu.Button("   LEAN RAILING SMOKING   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_SMOKING'
+                elseif WarMenu.Button("   LEAN RAILING INTERACTION   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_INTERACTION'
+                elseif WarMenu.Button("  LEAN RAILING DYNAMIC    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_DYNAMIC'
+            end
+                    WarMenu.Display()
+
+-----------------------------------------------------
+ 
+        elseif WarMenu.IsMenuOpened('Lean') then
+
+                if WarMenu.Button("   LEAN READ PAPER      ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_READ_PAPER'
+                 elseif WarMenu.Button("   LEAN READ PAPER TRAIN PLANS   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_READ_PAPER_TRAIN_PLANS'
+                 elseif WarMenu.Button("  GUARD LEAN WALL    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_GUARD_LEAN_WALL'
+                 elseif WarMenu.Button("  LEAN CHECK PISTOL    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_CHECK_PISTOL'
+                 elseif WarMenu.Button("   LEAN TABLE SHARPEN KNIFE ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_TABLE_SHARPEN_KNIFE'
+                elseif WarMenu.Button("  LEAN BARREL    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_BARREL'
+                elseif WarMenu.Button("    LEAN WALL DRINKING  ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_WALL_DRINKING'
+                elseif WarMenu.Button("   LEAN RAILING   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING'                
+                elseif WarMenu.Button("    LEAN RAILING DRINKING  ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_DRINKING'
+                 elseif WarMenu.Button("   LEAN RAILING SMOKING   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_SMOKING'
+                elseif WarMenu.Button("   LEAN RAILING INTERACTION   ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_INTERACTION'
+                elseif WarMenu.Button("  LEAN RAILING DYNAMIC    ") then
+                  animacion()
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_DYNAMIC'
+            end
+                    WarMenu.Display()
+
 -----------------------------------------------------
         end
 
