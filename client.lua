@@ -5,11 +5,12 @@ RegisterCommand('intmenu', function(source, args, rawCommand)             --
 end)                                                                      --       
                                                                              
  -- Основная проблема вот с этим говном             
-function animacion(sceneid) -- нужно ли в скобках sceneid я не уверен                                                                         --                              
+function animacion() -- нужно ли в скобках sceneid я не уверен                                                                         --                              
 local ped = PlayerPedId()   -- ped = это Pedestrian у Рокстарцев так называется что то одушевленное типа человека, животного                                                                           --                            
 local x, y, z = table.unpack(GetEntityCoords(ped))  -- table.unpack(GetEntityCoords(ped)) - берет текущее положение Entity, в нашем случае игрока      --                                                     
 local h = GetEntityHeading(ped) -- heading это направление (куда смотреть будет) - GetEntityHeading - текущее направление игрока                                        
-TaskStartScenarioAtPosition(ped, GetHashKey(sceneID), x, y, z, h, -1, false, false, 0, 0, false)      --   собственно нативная команда, которая начинает сценарий (предопределенная анимация) с конкретной позиции                                                                                                
+TaskStartScenarioAtPosition(ped, GetHashKey(sceneID), x, y, z, h, -1, false, false, 0, 0, false) 
+SceneID = nil     --   собственно нативная команда, которая начинает сценарий (предопределенная анимация) с конкретной позиции                                                                                                
 end                                                                                                   --      
 
 -- В идеале я хотел получить следующее: открывается менюшечка с анимациями и ты мог выбрать нужную анимку. 
@@ -46,24 +47,32 @@ Citizen.CreateThread(function()
       --  if WarMenu.MenuButton('Sitting on a chair/bench/stool', 'Sitchair') then end
 
             WarMenu.Display()
- 
+           
         elseif WarMenu.IsMenuOpened('Leanback') then
- 
-                if WarMenu.Button("     LEAN BACK RAILING   ") then     -- это создает кнопку с названием анимациями
-                  animacion()                                           --  отсылка к функции, описанной выше "function animacion(sceneid)"
-                  sceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING'  -- то что не работает
+               
+                if WarMenu.Button("     LEAN BACK RAILING   ") then    
+               --   sceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING'
+                 -- animacion(sceneID)
+                 print('nil') 
+                 Citizen.Wait(0)                            
                  elseif WarMenu.Button("   LEAN BACK WALL BACK WALL   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL'
+            --     SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL'
+             --     animacion(sceneID)
+             print('nil')
+             Citizen.Wait(0)   
                  elseif WarMenu.Button("   LEAN BACK WALL NO PROPS   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL_NO_PROPS'
+             --     SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL_NO_PROPS'
+              --    animacion(sceneID)
+              print('nil')
+              Citizen.Wait(0)   
                 elseif WarMenu.Button("   LEAN BACK RAILING WHITTLE   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_BACK_WHITTLE'
+                 SceneID = 'WORLD_HUMAN_LEAN_BACK_WHITTLE'
+                 animacion(SceneID)
+                 Citizen.Wait(0)   
                 elseif WarMenu.Button("   LEAN BACK DRINKING   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING_DRINKING'
+                  SceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING_DRINKING'
+                  animacion(SceneID)
+                  Citizen.Wait(0)   
             end
                     WarMenu.Display()
 
