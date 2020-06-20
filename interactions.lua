@@ -1,16 +1,29 @@
-RegisterCommand('intmenu', function(source, args, rawCommand)
-    RegisterNetEvent("newmenu")
-     WarMenu.OpenMenu('Animations')
-     WarMenu.Display()
-end)
+RegisterCommand('hardreset', function(source, args, rawCommand)           
+    RegisterNetEvent("hardreset1")                                         
+    ClearPedTasksImmediately(PlayerPedId())                                               
+end)                                       
 
+RegisterCommand('resetanim', function(source, args, rawCommand)           
+    RegisterNetEvent("resetanimka")                                         
+    ClearPedTasks(PlayerPedId())                                               
+end)     
 
-function animacion(sceneid)
-local ped = PlayerPedId()
-local x, y, z = table.unpack(GetEntityCoords(ped))
-local h = GetEntityHeading(ped)
-TaskStartScenarioAtPosition(ped, GetHashKey(sceneID), x, y, z, h, -1, false, false, 0, 0, false)
-end
+      
+
+RegisterCommand('intmenu', function(source, args, rawCommand)           
+    RegisterNetEvent("newmenu")                                         
+     WarMenu.OpenMenu('Animations')                                                                      
+     WarMenu.Display()                                                  
+end)                                                                                                                                            
+           
+function animacion(SceneID)                                                                                         
+local ped = PlayerPedId()                                                                                                        
+local x, y, z = table.unpack(GetEntityCoords(ped))             
+local h = GetEntityHeading(ped)                                        
+TaskStartScenarioAtPosition(ped, GetHashKey(SceneID), x, y, z, h, -1, false, false, 0, 0, false) 
+SceneID = nil                                                                                                
+end                                                                                                      
+
 
 
 Citizen.CreateThread(function()
@@ -34,24 +47,34 @@ Citizen.CreateThread(function()
       --  if WarMenu.MenuButton('Sitting on a chair/bench/stool', 'Sitchair') then end
 
             WarMenu.Display()
- 
+           
         elseif WarMenu.IsMenuOpened('Leanback') then
-
-                if WarMenu.Button("     LEAN BACK RAILING   ") then
-                  animacion()
-                  sceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING'
+               
+                if WarMenu.Button("     LEAN BACK RAILING   ") then    
+                      sceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING'
+                      animacion(sceneID)
+                      WarMenu.CloseMenu('Leanback')
+            Citizen.Wait(5)                            
                  elseif WarMenu.Button("   LEAN BACK WALL BACK WALL   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL'
+                        SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL'
+                        animacion(sceneID)
+                        WarMenu.CloseMenu('Leanback')
+            Citizen.Wait(5)   
                  elseif WarMenu.Button("   LEAN BACK WALL NO PROPS   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL_NO_PROPS'
+                        SceneID = 'WORLD_HUMAN_LEAN_BACK_WALL_NO_PROPS'
+                        animacion(sceneID)
+                        WarMenu.CloseMenu('Leanback')
+            Citizen.Wait(5)   
                 elseif WarMenu.Button("   LEAN BACK RAILING WHITTLE   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_BACK_WHITTLE'
+                         SceneID = 'WORLD_HUMAN_LEAN_BACK_WHITTLE'
+                         animacion(SceneID)
+                         WarMenu.CloseMenu('Leanback')
+            Citizen.Wait(5)   
                 elseif WarMenu.Button("   LEAN BACK DRINKING   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING_DRINKING'
+                          SceneID = 'WORLD_HUMAN_LEAN_BACK_RAILING_DRINKING'
+                          animacion(SceneID)
+                          WarMenu.CloseMenu('Leanback')
+            Citizen.Wait(5)   
             end
                     WarMenu.Display()
 
@@ -60,18 +83,28 @@ Citizen.CreateThread(function()
             elseif WarMenu.IsMenuOpened('Leanleft') then
 
                 if WarMenu.Button("     LEAN POST LEFT   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_POST_LEFT'
-                 elseif WarMenu.Button("   LEAN POST LEFT HAND PLANTED   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_POST_LEFT_HAND_PLANTED'
-                 elseif WarMenu.Button("  LEAN RAILING LEFT    ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_RAILING_LEFT'
-                 elseif WarMenu.Button("  LEAN WALL LEFT    ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_WALL_LEFT'
+                          SceneID = 'WORLD_HUMAN_LEAN_POST_LEFT'
+                          animacion(SceneID)
+                          WarMenu.CloseMenu('Leanleft')
+             Citizen.Wait(5)    
 
+                 elseif WarMenu.Button("   LEAN POST LEFT HAND PLANTED   ") then
+                SceneID = 'WORLD_HUMAN_LEAN_POST_LEFT_HAND_PLANTED'
+                          animacion(SceneID)
+                          WarMenu.CloseMenu('Leanleft')
+             Citizen.Wait(5) 
+
+                 elseif WarMenu.Button("  LEAN RAILING LEFT    ") then
+                SceneID = 'WORLD_HUMAN_LEAN_RAILING_LEFT'
+                          animacion(SceneID)
+                          WarMenu.CloseMenu('Leanleft')
+             Citizen.Wait(5)  
+
+                 elseif WarMenu.Button("  LEAN WALL LEFT    ") then
+                SceneID = 'WORLD_HUMAN_LEAN_WALL_LEFT'
+                          animacion(SceneID)
+                          WarMenu.CloseMenu('Leanleft')
+             Citizen.Wait(5)  
             end
                     WarMenu.Display()
 -----------------------------------------------------
@@ -79,14 +112,20 @@ Citizen.CreateThread(function()
             elseif WarMenu.IsMenuOpened('Leanright') then
 
                 if WarMenu.Button("     LEAN POST RIGHT   ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_POST_RIGHT'
+                          animacion(SceneID)
+                          WarMenu.CloseMenu('Leanright')
+             Citizen.Wait(5)                  
                  elseif WarMenu.Button("  LEAN POST RIGHT HAND PLANTED    ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_POST_RIGHT_HAND_PLANTED'
+                          animacion(SceneID)
+                          WarMenu.CloseMenu('Leanright')
+             Citizen.Wait(5)  
                  elseif WarMenu.Button("  LEAN WALL RIGHT    ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_WALL_RIGHT'
+                          animacion(SceneID)
+                          WarMenu.CloseMenu('Leanright')
+             Citizen.Wait(5)  
             end
                     WarMenu.Display()
 -----------------------------------------------------
@@ -94,89 +133,87 @@ Citizen.CreateThread(function()
         elseif WarMenu.IsMenuOpened('Lean') then
 
                 if WarMenu.Button("   LEAN READ PAPER      ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_READ_PAPER'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                  elseif WarMenu.Button("   LEAN READ PAPER TRAIN PLANS   ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_READ_PAPER_TRAIN_PLANS'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                  elseif WarMenu.Button("  GUARD LEAN WALL    ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_GUARD_LEAN_WALL'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                  elseif WarMenu.Button("  LEAN CHECK PISTOL    ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_CHECK_PISTOL'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                  elseif WarMenu.Button("   LEAN TABLE SHARPEN KNIFE ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_TABLE_SHARPEN_KNIFE'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                 elseif WarMenu.Button("  LEAN BARREL    ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_BARREL'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                  elseif WarMenu.Button("  LEAN BAR READ NEWSPAPER    ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_BAR_READ_NEWSPAPER'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                 elseif WarMenu.Button("    LEAN WALL DRINKING  ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_WALL_DRINKING'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                 elseif WarMenu.Button("   LEAN RAILING   ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_RAILING'                
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                 elseif WarMenu.Button("    LEAN RAILING DRINKING  ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_RAILING_DRINKING'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                  elseif WarMenu.Button("   LEAN RAILING SMOKING   ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_RAILING_SMOKING'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                 elseif WarMenu.Button("   LEAN RAILING INTERACTION   ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_RAILING_INTERACTION'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
                 elseif WarMenu.Button("  LEAN RAILING DYNAMIC    ") then
-                  animacion()
                 SceneID = 'WORLD_HUMAN_LEAN_RAILING_DYNAMIC'
+
+          animacion(SceneID)
+          WarMenu.CloseMenu('Lean')
+          Citizen.Wait(5)
             end
                     WarMenu.Display()
-
 -----------------------------------------------------
- 
-        elseif WarMenu.IsMenuOpened('Lean') then
 
-                if WarMenu.Button("   LEAN READ PAPER      ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_READ_PAPER'
-                 elseif WarMenu.Button("   LEAN READ PAPER TRAIN PLANS   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_READ_PAPER_TRAIN_PLANS'
-                 elseif WarMenu.Button("  GUARD LEAN WALL    ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_GUARD_LEAN_WALL'
-                 elseif WarMenu.Button("  LEAN CHECK PISTOL    ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_CHECK_PISTOL'
-                 elseif WarMenu.Button("   LEAN TABLE SHARPEN KNIFE ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_TABLE_SHARPEN_KNIFE'
-                elseif WarMenu.Button("  LEAN BARREL    ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_BARREL'
-                elseif WarMenu.Button("    LEAN WALL DRINKING  ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_WALL_DRINKING'
-                elseif WarMenu.Button("   LEAN RAILING   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_RAILING'                
-                elseif WarMenu.Button("    LEAN RAILING DRINKING  ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_RAILING_DRINKING'
-                 elseif WarMenu.Button("   LEAN RAILING SMOKING   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_RAILING_SMOKING'
-                elseif WarMenu.Button("   LEAN RAILING INTERACTION   ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_RAILING_INTERACTION'
-                elseif WarMenu.Button("  LEAN RAILING DYNAMIC    ") then
-                  animacion()
-                SceneID = 'WORLD_HUMAN_LEAN_RAILING_DYNAMIC'
-            end
-                    WarMenu.Display()
 
 -----------------------------------------------------
         end
